@@ -1,4 +1,4 @@
-package com.example.ics324_project
+package com.ICS324.LIBSYS
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ics324_project">
+    package="com.ICS324.LIBSYS">
    <application
         android:label="ics324_project"
         android:icon="@mipmap/ic_launcher">
