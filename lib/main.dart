@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ics324_project/recipe_card.dart';
+import 'package:ics324_project/BookCard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,58 +10,28 @@ void main() async {
     FirebaseFirestore.instance.settings = Settings(
         host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
   }
-  runApp(const HomePage());
+  runApp(const MyApp());
 }
 
-// class MyApp extends StatefulWidget {
-//   const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blueGrey,
+          primaryColor: Colors.amberAccent,
+          textTheme: TextTheme(
+            bodyText2: TextStyle(color: Colors.white),
+          ),
+        ),
+        home: const HomePage());
+  }
+}
 
-// class _MyAppState extends State<MyApp> {
-//   var _books;
-
-//   void _onPressed() {
-//     FirebaseFirestore.instance
-//         .collection('Book')
-//         .get()
-//         .then((QuerySnapshot querySnapshot) {
-//       querySnapshot.docs.forEach((doc) {
-//         _books.add(doc.data());
-//       });
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(
-//           title: Row(
-//             children: [
-//               Icon(Icons.restaurant),
-//               SizedBox(
-//                 width: 10,
-//               ),
-//               Text("Food Recipe")
-//             ],
-//           ),
-//         ),
-//         body: ListView.builder(
-//           itemCount: _books.length,
-//           itemBuilder: (context, index) {
-//             return RecipeCard(
-//                 title: _books[index]['title'],
-//                 author: _books[index]['author'],
-//                 copies: _books[index]['copies'],
-//                 imageURL: _books[index]['imageURL']);
-//           },
-//         ));
-//   }
-// }
-
-//---------------------------------------------------------------------------------------------
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -70,20 +40,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List _books = [];
+  bool isFirstTime = false;
+  List<DocumentSnapshot> datas = <DocumentSnapshot>[];
+
+  getData() async {
+    if (!isFirstTime) {
+      QuerySnapshot snap =
+          await FirebaseFirestore.instance.collection("Book").get();
+      isFirstTime = true;
+      setState(() {
+        datas.addAll(snap.docs);
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-
-    FirebaseFirestore.instance
-        .collection('Book')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        _books.add(doc.data());
-      });
-    });
   }
 
   @override
@@ -92,23 +65,30 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: Row(
             children: [
-              Icon(Icons.restaurant),
+              FloatingActionButton(
+                onPressed: getData,
+                tooltip: 'Increment',
+                child: Icon(Icons.add),
+              ),
+              Icon(Icons.book),
               SizedBox(
                 width: 10,
               ),
-              Text("Food Recipe")
+              Text("LYBSIS")
             ],
           ),
         ),
-        body: ListView.builder(
-          itemCount: _books.length,
-          itemBuilder: (context, index) {
-            return RecipeCard(
-                title: _books[index]['title'],
-                author: _books[index]['author'],
-                copies: _books[index]['copies'],
-                imageURL: _books[index]['imageURL']);
-          },
-        ));
+        body: !isFirstTime
+            ? Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                itemCount: datas.length,
+                itemBuilder: (context, index) {
+                  return BookCard(
+                      title: datas[index]['title'],
+                      author: datas[index]['author'],
+                      copies: datas[index]['copies'],
+                      imageURL: datas[index]['imageURL']);
+                },
+              ));
   }
 }

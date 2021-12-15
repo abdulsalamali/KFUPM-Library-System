@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class RecipeCard extends StatelessWidget {
+class BookCard extends StatelessWidget {
   final String title;
   final String author;
   final String copies;
   final String imageURL;
-  RecipeCard({
+  BookCard({
     required this.title,
     required this.copies,
     required this.author,
