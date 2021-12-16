@@ -2,8 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ics324_project/BookCard.dart';
+import 'Book.dart';
 
 void main() async {
+  var myObject = HomePageState();
+  // print('$myObject.searchQueryi');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   if (false) {
@@ -20,15 +23,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blueGrey,
-          primaryColor: Colors.amberAccent,
-          textTheme: TextTheme(
-            bodyText2: TextStyle(color: Colors.white),
-          ),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+        primaryColor: Colors.amberAccent,
+        textTheme: TextTheme(
+          bodyText2: TextStyle(color: Colors.white),
         ),
-        home: const HomePage());
+      ),
+      home: const HomePage(),
+      routes: <String, WidgetBuilder>{
+        '/Book': (BuildContext context) => Book(
+              hul: (HomePageState.searchQueryController.text.isNotEmpty)
+                  ? HomePageState.searchQueryController.text
+                  : 'Enter search please',
+            ),
+        // '/b': (BuildContext context) => MyPage(title: 'page B'),
+        // '/c': (BuildContext context) => MyPage(title: 'page C'),
+      },
+    );
   }
 }
 
@@ -36,12 +49,16 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   bool isFirstTime = false;
   List<DocumentSnapshot> datas = <DocumentSnapshot>[];
+  static var searchQueryController = TextEditingController();
+  bool _isSearching = false;
+
+  String searchQuery = "Search query";
 
   getData() async {
     if (!isFirstTime) {
@@ -59,24 +76,90 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  Widget _buildSearchField() {
+    return TextField(
+      controller: searchQueryController,
+      autofocus: true,
+      decoration: InputDecoration(
+        hintText: "Search Data...",
+        border: InputBorder.none,
+        hintStyle: TextStyle(color: Colors.white30),
+      ),
+      style: TextStyle(color: Colors.white, fontSize: 16.0),
+      onChanged: (query) => updateSearchQuery(query),
+    );
+  }
+
+  ///
+  void connect() {
+    Navigator.pushNamed(context, '/Book');
+  }
+
+  ///
+
+  List<Widget> _buildActions() {
+    if (_isSearching) {
+      return <Widget>[
+        IconButton(
+          icon: const Icon(Icons.search_rounded),
+          onPressed: () {
+            connect();
+          },
+        ),
+      ];
+    }
+
+    return <Widget>[
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: _startSearch,
+      ),
+    ];
+  }
+
+  void _startSearch() {
+    ModalRoute.of(context)!
+        .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
+
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+    });
+  }
+
+  void _stopSearching() {
+    _clearSearchQuery();
+
+    setState(() {
+      _isSearching = false;
+    });
+  }
+
+  void _clearSearchQuery() {
+    setState(() {
+      searchQueryController.clear();
+      updateSearchQuery("");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Row(
-            children: [
-              FloatingActionButton(
-                onPressed: getData,
-                tooltip: 'Increment',
-                child: Icon(Icons.add),
-              ),
-              Icon(Icons.book),
-              SizedBox(
-                width: 10,
-              ),
-              Text("LYBSIS")
-            ],
-          ),
+          leading: _isSearching ? const BackButton() : Container(),
+          title: _isSearching ? _buildSearchField() : _buildTitle(context),
+          actions: _buildActions(),
+        ),
+        floatingActionButton: FloatingActionButton(
+          /* Fetches the books from the DB */
+          onPressed: getData,
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
         ),
         body: !isFirstTime
             ? Center(child: CircularProgressIndicator())
@@ -84,6 +167,7 @@ class _HomePageState extends State<HomePage> {
                 itemCount: datas.length,
                 itemBuilder: (context, index) {
                   return BookCard(
+                      // extra: add hero.
                       title: datas[index]['title'],
                       author: datas[index]['author'],
                       copies: datas[index]['copies'],
@@ -92,3 +176,5 @@ class _HomePageState extends State<HomePage> {
               ));
   }
 }
+
+_buildTitle(BuildContext context) {}
