@@ -176,7 +176,10 @@ class HomePageState extends State<HomePage> {
                               builder: (context) => const BookDetails(),
                               settings: RouteSettings(
                                   // passes an argument to change the route dynamically.
-                                  arguments: datas[index]['ISBN'])));
+                                  arguments: [
+                                    datas[index]['ISBN'],
+                                    datas[index]['copies']
+                                  ])));
                     },
                     child: BookCard(
                         // extra: add hero.

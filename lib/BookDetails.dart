@@ -36,8 +36,8 @@ class _BookDetailsState extends State<BookDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final isbn = ModalRoute.of(context)!.settings.arguments
-        as String; // the value passed by main.dart.
+    final list = ModalRoute.of(context)!.settings.arguments
+        as List<dynamic>; // the value passed by main.dart.
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
@@ -71,8 +71,9 @@ class _BookDetailsState extends State<BookDetails> {
         body: ListView.builder(
           itemCount: datas.length,
           itemBuilder: (context, index) {
-            if (isbn == datas[index]['ISBN']) {
+            if (list[0] == datas[index]['ISBN']) {
               return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   BookCard(
                       // extra: add hero.
