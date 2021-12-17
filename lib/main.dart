@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ics324_project/BookCard.dart';
+import 'package:ics324_project/BookDetails.dart';
 import 'Book.dart';
+import 'BookDetails.dart';
 
 void main() async {
   var myObject = HomePageState();
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
                   ? HomePageState.searchQueryController.text
                   : 'Enter search please',
             ),
-        // '/b': (BuildContext context) => MyPage(title: 'page B'),
+        '/details': (BuildContext context) => BookDetails(),
         // '/c': (BuildContext context) => MyPage(title: 'page C'),
       },
     );
@@ -166,12 +168,23 @@ class HomePageState extends State<HomePage> {
             : ListView.builder(
                 itemCount: datas.length,
                 itemBuilder: (context, index) {
-                  return BookCard(
-                      // extra: add hero.
-                      title: datas[index]['title'],
-                      author: datas[index]['author'],
-                      copies: datas[index]['copies'],
-                      imageURL: datas[index]['imageURL']);
+                  return GestureDetector(
+                    onLongPress: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const BookDetails(),
+                              settings: RouteSettings(
+                                  // passes an argument to change the route dynamically.
+                                  arguments: datas[index]['ISBN'])));
+                    },
+                    child: BookCard(
+                        // extra: add hero.
+                        title: datas[index]['title'],
+                        author: datas[index]['author'],
+                        copies: datas[index]['copies'],
+                        imageURL: datas[index]['imageURL']),
+                  );
                 },
               ));
   }
