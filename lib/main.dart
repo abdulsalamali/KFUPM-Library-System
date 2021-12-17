@@ -5,6 +5,11 @@ import 'package:ics324_project/BookCard.dart';
 import 'package:ics324_project/BookDetails.dart';
 import 'Book.dart';
 import 'BookDetails.dart';
+/**
+ *  register page logic --> 2 buttons one login one to sign up
+ * login: same pass? go else no ( controller == user.pass)
+ * sign up: new user
+ */
 
 void main() async {
   var myObject = HomePageState();

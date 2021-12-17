@@ -34,6 +34,31 @@ class _BookDetailsState extends State<BookDetails> {
     super.initState();
   }
 
+  Widget buildWidget({BuildContext? context, String n = ''}) {
+    var myint = int.parse(n);
+    if (myint == 0) {
+      return ElevatedButton(
+        onPressed: () {},
+        child: Text('Reserve'),
+        style: ButtonStyle(
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18.0),
+          //side: BorderSide(color: Colors.red)
+        ))),
+      );
+    } else {
+      return ElevatedButton(
+        onPressed: () {},
+        child: Text('Borrow'),
+        style: ButtonStyle(
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18.0),
+          //side: BorderSide(color: Colors.red)
+        ))),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final list = ModalRoute.of(context)!.settings.arguments
@@ -68,34 +93,36 @@ class _BookDetailsState extends State<BookDetails> {
             },
           ),
         ),
-        body: ListView.builder(
-          itemCount: datas.length,
-          itemBuilder: (context, index) {
-            if (list[0] == datas[index]['ISBN']) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  BookCard(
-                      // extra: add hero.
-                      title: datas[index]['title'],
-                      author: datas[index]['author'],
-                      copies: datas[index]['copies'],
-                      imageURL: datas[index]['imageURL']),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('llllll',
-                          style: TextStyle(
-                              color:
-                                  Colors.red)), // a place holder for a button
-                    ],
-                  )
-                ],
-              );
-            } else {
-              return Center(child: Text(''));
-            }
-          },
+        body: Padding(
+          padding: const EdgeInsets.only(top: 200),
+          child: ListView.builder(
+            itemCount: datas.length,
+            itemBuilder: (context, index) {
+              if (list[0] == datas[index]['ISBN']) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    BookCard(
+                        // extra: add hero.
+                        title: datas[index]['title'],
+                        author: datas[index]['author'],
+                        copies: datas[index]['copies'],
+                        imageURL: datas[index]['imageURL']),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        buildWidget(
+                            context: context,
+                            n: list[1]), // a place holder for a button
+                      ],
+                    )
+                  ],
+                );
+              } else {
+                return Center(child: Text(''));
+              }
+            },
+          ),
         ),
       ),
     );
