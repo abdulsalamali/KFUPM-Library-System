@@ -29,7 +29,13 @@ class _homeState extends State<home> {
     }
     print(datas.length);
     if (controller1.text == text || controller2.text == text1) {
-      return Navigator.pushNamed(context, '/Allbooks');
+      return Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const HomePage(),
+              settings: RouteSettings(
+                  // passes an argument to change the route dynamically.
+                  arguments: text)));
     } else {
       return showDialog(
           context: context,

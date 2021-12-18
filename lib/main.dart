@@ -158,6 +158,8 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final ssn = ModalRoute.of(context)!.settings.arguments as String;
+    final secure = ssn;
     return Scaffold(
         appBar: AppBar(
           leading: _isSearching ? const BackButton() : Container(),
@@ -198,7 +200,9 @@ class HomePageState extends State<HomePage> {
                                   // passes an argument to change the route dynamically.
                                   arguments: [
                                     datas[index]['ISBN'],
-                                    datas[index]['copies']
+                                    datas[index]['copies'],
+                                    secure,
+                                    datas[index]['barcode']
                                   ])));
                     },
                     child: BookCard(

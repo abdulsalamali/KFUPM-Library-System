@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class BookCard extends StatelessWidget {
   final String title;
   final String author;
-  final String copies;
+  final int copies;
   final String imageURL;
   BookCard({
     required this.title,
@@ -95,7 +95,7 @@ class BookCard extends StatelessWidget {
                         size: 18,
                       ),
                       SizedBox(width: 7),
-                      Text(copies),
+                      Text(copies.toString()),
                     ],
                   ),
                 )

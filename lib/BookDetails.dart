@@ -34,11 +34,25 @@ class _BookDetailsState extends State<BookDetails> {
     super.initState();
   }
 
-  Widget buildWidget({BuildContext? context, String n = ''}) {
-    var myint = int.parse(n);
-    if (myint == 0) {
+  CollectionReference users =
+      FirebaseFirestore.instance.collection('Reservation');
+
+  Future<void> addUser(ssn, barcode) {
+    // Call the user's CollectionReference to add a new user
+    return users
+        .add({
+          'SSN': ssn, // John Doe
+          // 'company': company, // Stokes and Sons
+          'barcode': barcode // 42
+        })
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+
+  Widget buildWidget({BuildContext? context, int? n, fun}) {
+    if (n == 0) {
       return ElevatedButton(
-        onPressed: () {},
+        onPressed: fun,
         child: Text('Reserve'),
         style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -63,6 +77,9 @@ class _BookDetailsState extends State<BookDetails> {
   Widget build(BuildContext context) {
     final list = ModalRoute.of(context)!.settings.arguments
         as List<dynamic>; // the value passed by main.dart.
+    dynamic isbn = list[0];
+    dynamic ssn = list[2];
+    dynamic barcode = list[3];
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
@@ -113,7 +130,9 @@ class _BookDetailsState extends State<BookDetails> {
                       children: [
                         buildWidget(
                             context: context,
-                            n: list[1]), // a place holder for a button
+                            n: list[1],
+                            fun: addUser(
+                                ssn, barcode)), // a place holder for a button
                       ],
                     )
                   ],
