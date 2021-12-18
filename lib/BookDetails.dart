@@ -37,6 +37,19 @@ class _BookDetailsState extends State<BookDetails> {
   CollectionReference users =
       FirebaseFirestore.instance.collection('Reservation');
 
+  CollectionReference Reserver =
+      FirebaseFirestore.instance.collection('Reserves');
+
+  Future<void> addReserve(ssn, barcode) {
+    return Reserver.add({
+      'SSN': ssn, // John Doe
+      // 'company': company, // Stokes and Sons
+      'barcode': barcode // 42
+    })
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+
   Future<void> addUser(ssn, barcode) {
     // Call the user's CollectionReference to add a new user
     return users
@@ -52,7 +65,9 @@ class _BookDetailsState extends State<BookDetails> {
   Widget buildWidget({BuildContext? context, int? n, fun}) {
     if (n == 0) {
       return ElevatedButton(
-        onPressed: fun,
+        onPressed: () {
+          fun;
+        },
         child: Text('Reserve'),
         style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -62,7 +77,9 @@ class _BookDetailsState extends State<BookDetails> {
       );
     } else {
       return ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          fun;
+        },
         child: Text('Borrow'),
         style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -131,8 +148,10 @@ class _BookDetailsState extends State<BookDetails> {
                         buildWidget(
                             context: context,
                             n: list[1],
-                            fun: addUser(
-                                ssn, barcode)), // a place holder for a button
+                            fun: (list[1] == 0)
+                                ? addReserve(ssn, barcode)
+                                : addUser(ssn,
+                                    barcode)), // a place holder for a button
                       ],
                     )
                   ],
