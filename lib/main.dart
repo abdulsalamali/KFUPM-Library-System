@@ -5,6 +5,7 @@ import 'package:ics324_project/BookCard.dart';
 import 'package:ics324_project/BookDetails.dart';
 import 'Book.dart';
 import 'BookDetails.dart';
+import 'homepage.dart';
 /**
  *  register page logic --> 2 buttons one login one to sign up
  * login: same pass? go else no ( controller == user.pass)
@@ -20,7 +21,7 @@ void main() async {
     FirebaseFirestore.instance.settings = Settings(
         host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
   }
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
           bodyText2: TextStyle(color: Colors.white),
         ),
       ),
-      home: const HomePage(),
+      initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/Book': (BuildContext context) => Book(
               hul: (HomePageState.searchQueryController.text.isNotEmpty)
@@ -46,7 +47,8 @@ class MyApp extends StatelessWidget {
                   : 'Enter search please',
             ),
         '/details': (BuildContext context) => BookDetails(),
-        // '/c': (BuildContext context) => MyPage(title: 'page C'),
+        '/Allbooks': (BuildContext context) => const HomePage(),
+        '/': (BuildContext context) => home(),
       },
     );
   }
@@ -162,11 +164,24 @@ class HomePageState extends State<HomePage> {
           title: _isSearching ? _buildSearchField() : _buildTitle(context),
           actions: _buildActions(),
         ),
-        floatingActionButton: FloatingActionButton(
-          /* Fetches the books from the DB */
-          onPressed: getData,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              /* Fetches the books from the DB */
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              tooltip: 'logout',
+              child: Icon(Icons.logout),
+            ),
+            FloatingActionButton(
+              /* Fetches the books from the DB */
+              onPressed: getData,
+              tooltip: 'Increment',
+              child: Icon(Icons.add),
+            ),
+          ],
         ),
         body: !isFirstTime
             ? Center(child: CircularProgressIndicator())
