@@ -17,6 +17,8 @@ class BookDetails extends StatefulWidget {
 class _BookDetailsState extends State<BookDetails> {
   bool isFirstTime = false;
   List<DocumentSnapshot> datas = <DocumentSnapshot>[];
+  var outDate = DateTime.now();
+  var returnDate;
 
   getData() async {
     if (!isFirstTime) {
@@ -34,8 +36,7 @@ class _BookDetailsState extends State<BookDetails> {
     super.initState();
   }
 
-  CollectionReference users =
-      FirebaseFirestore.instance.collection('Reservation');
+  CollectionReference users = FirebaseFirestore.instance.collection('Borrows');
 
   CollectionReference Reserver =
       FirebaseFirestore.instance.collection('Reserves');
@@ -50,13 +51,17 @@ class _BookDetailsState extends State<BookDetails> {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
-  Future<void> addUser(ssn, barcode) {
+  Future<void> addUser(ssn, barcode, cDate, rDate) {
+    //borrower
     // Call the user's CollectionReference to add a new user
+    returnDate = outDate.add(Duration(days: 50));
     return users
         .add({
           'SSN': ssn, // John Doe
           // 'company': company, // Stokes and Sons
-          'barcode': barcode // 42
+          'barcode': barcode, // 42
+          'checkout date': cDate,
+          'Return date': rDate
         })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
@@ -150,8 +155,8 @@ class _BookDetailsState extends State<BookDetails> {
                             n: list[1],
                             fun: (list[1] == 0)
                                 ? addReserve(ssn, barcode)
-                                : addUser(ssn,
-                                    barcode)), // a place holder for a button
+                                : addUser(ssn, barcode, outDate,
+                                    returnDate)), // a place holder for a button
                       ],
                     )
                   ],
