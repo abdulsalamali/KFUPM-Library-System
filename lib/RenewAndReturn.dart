@@ -15,13 +15,29 @@ class RPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(children: [
+      child:
+          Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Image(
           image: NetworkImage(imageURL),
         ),
-        Text(author),
-        Row(children: [Text(author), Text(copies)]),
+        Text(
+          title,
+          style: TextStyle(fontSize: 35),
+        ),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          Text(
+            "Auther: " + author,
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 20),
+          ),
+          Text(
+            "Remain copies: " + copies,
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 20),
+          )
+        ]),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             RaisedButton(
               child: Text(
