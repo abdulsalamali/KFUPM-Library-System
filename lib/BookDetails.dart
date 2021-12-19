@@ -6,6 +6,7 @@ import 'package:ics324_project/BookCard.dart';
 import 'Book.dart';
 import 'BookCard.dart';
 import 'main.dart';
+import 'dart:math';
 
 class BookDetails extends StatefulWidget {
   const BookDetails({Key? key}) : super(key: key);
@@ -18,7 +19,12 @@ class _BookDetailsState extends State<BookDetails> {
   bool isFirstTime = false;
   List<DocumentSnapshot> datas = <DocumentSnapshot>[];
   var outDate = DateTime.now();
-  var returnDate;
+  var returnDate = DateTime.now().add(Duration(days: 90));
+  var extendDate =
+      DateTime.now().add(Duration(days: 90)).add(Duration(days: 30));
+
+  dynamic SSN;
+  dynamic BARCODE;
 
   getData() async {
     if (!isFirstTime) {
@@ -37,7 +43,7 @@ class _BookDetailsState extends State<BookDetails> {
   }
 
   CollectionReference users = FirebaseFirestore.instance.collection('Borrows');
-
+  //CollectionReference borrowsCollection = FirebaseFirestore.instance.collection(collectionPath)
   CollectionReference Reserver =
       FirebaseFirestore.instance.collection('Reserves');
 
@@ -51,27 +57,85 @@ class _BookDetailsState extends State<BookDetails> {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
+  int generateRandom() {
+    Random random = new Random();
+    int id = random.nextInt(5);
+    return id;
+  }
+
+  reduceCopies() {}
   Future<void> addUser(ssn, barcode, cDate, rDate) {
     //borrower
     // Call the user's CollectionReference to add a new user
-    returnDate = outDate.add(Duration(days: 50));
+    // returnDate = outDate.add(Duration(days: 50));
+
     return users
         .add({
-          'SSN': ssn, // John Doe
+          'id': generateRandom(), 'SSN': ssn, // John Doe
           // 'company': company, // Stokes and Sons
           'barcode': barcode, // 42
           'checkout date': cDate,
-          'Return date': rDate
+          'Return date': rDate,
+          'returned': false
         })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
   }
 
-  Widget buildWidget({BuildContext? context, int? n, fun}) {
+  dynamic meditaor(ssn, barcode) {
+    SSN = ssn;
+    BARCODE = barcode;
+  }
+
+  extendReservation() {
+    var tmp = [];
+
+    users
+        .where("id", isEqualTo: reservationDoc['id'])
+        .get()
+        .then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((element) {
+        tmp.add(element.id);
+      });
+    });
+
+    users.doc(tmp[0]).update({'Return Date': extendDate});
+  }
+
+  dynamic rrSSN;
+  dynamic rrBarcode;
+
+  var listOfReservation = [];
+  var reservationDoc;
+
+  dynamic returnBook() {
+    bool check = false;
+
+    rrSSN =
+        users.where("SSN", isEqualTo: SSN).get().then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((element) {
+        listOfReservation.add(element.data());
+      });
+    });
+
+    // print(listOfReservation[0]);
+
+    for (var i = 0; i < listOfReservation.length; i++) {
+      if (listOfReservation[i]['barcode'] == BARCODE) {
+        reservationDoc = listOfReservation[i];
+        check = true;
+      }
+    }
+
+    return check;
+  }
+
+//
+  Widget buildWidget({BuildContext? context, int? n, Future? fun}) {
     if (n == 0) {
       return ElevatedButton(
         onPressed: () {
-          fun;
+          addReserve(SSN, BARCODE);
         },
         child: Text('Reserve'),
         style: ButtonStyle(
@@ -80,10 +144,37 @@ class _BookDetailsState extends State<BookDetails> {
           //side: BorderSide(color: Colors.red)
         ))),
       );
+    } else if (returnBook()) {
+      return Row(
+        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ElevatedButton(
+            onPressed: () {},
+            child: Text('Return'),
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              //side: BorderSide(color: Colors.red)
+            ))),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              extendReservation();
+            },
+            child: Text('Extend'),
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              //side: BorderSide(color: Colors.red)
+            ))),
+          ),
+        ],
+      );
     } else {
       return ElevatedButton(
         onPressed: () {
-          fun;
+          addUser(SSN, BARCODE, outDate, returnDate); //call
+          returnBook();
         },
         child: Text('Borrow'),
         style: ButtonStyle(
@@ -133,7 +224,7 @@ class _BookDetailsState extends State<BookDetails> {
           ),
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 200),
+          padding: const EdgeInsets.only(top: 75),
           child: ListView.builder(
             itemCount: datas.length,
             itemBuilder: (context, index) {
@@ -153,10 +244,8 @@ class _BookDetailsState extends State<BookDetails> {
                         buildWidget(
                             context: context,
                             n: list[1],
-                            fun: (list[1] == 0)
-                                ? addReserve(ssn, barcode)
-                                : addUser(ssn, barcode, outDate,
-                                    returnDate)), // a place holder for a button
+                            fun: meditaor(
+                                ssn, barcode)), // a place holder for a button
                       ],
                     )
                   ],

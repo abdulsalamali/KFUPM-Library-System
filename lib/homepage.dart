@@ -99,7 +99,7 @@ class _homeState extends State<home> {
         body: Column(
           children: [
             Padding(
-              padding: EdgeInsets.only(left: 50, right: 50, top: 200),
+              padding: EdgeInsets.only(left: 50, right: 50, top: 75),
               child: TextField(
                 controller: controller1,
                 decoration: InputDecoration(
