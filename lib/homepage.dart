@@ -73,6 +73,7 @@ class _homeState extends State<home> {
 
   @override
   void initState() {
+    getData();
     super.initState();
   }
 
@@ -87,12 +88,6 @@ class _homeState extends State<home> {
         ),
       ),
       home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          /* Fetches the books from the DB */
-          onPressed: getData,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ),
         appBar: AppBar(
           title: Text('Home page'),
           centerTitle: true,

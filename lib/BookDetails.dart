@@ -5,11 +5,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ics324_project/BookCard.dart';
+import 'package:ics324_project/BookCardv2.dart';
+
 import 'package:uuid/uuid.dart';
 import 'Book.dart';
 import 'BookCard.dart';
 import 'main.dart';
-import 'dart:math';
+import 'BookCard.dart';
 
 class BookDetails extends StatefulWidget {
   const BookDetails({Key? key}) : super(key: key);
@@ -40,8 +42,43 @@ class _BookDetailsState extends State<BookDetails> {
     }
   }
 
+  dynamic rrSSN;
+  dynamic rrBarcode;
+  bool check = false;
+
+  var listOfReservation = [];
+  var docOfReservation = "";
+  var reservedBookToDecrement = '';
+//---------------------------------------------------------------------------
+
+  dynamic userBorrows() async {
+    rrSSN = await users
+        .where("SSN", isEqualTo: SSN)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((element) {
+        listOfReservation.add(element.data());
+      });
+    });
+  }
+
+  dynamic checkBook() async {
+    await getData();
+    await userBorrows();
+    for (var i = 0; i < listOfReservation.length; i++) {
+      if (listOfReservation[i]['barcode'] == BARCODE &&
+          listOfReservation[i]['returned'] == false) {
+        docOfReservation = listOfReservation[i]['id'];
+        setState(() {
+          check = true;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
+    checkBook();
     super.initState();
   }
 
@@ -68,6 +105,7 @@ class _BookDetailsState extends State<BookDetails> {
     if (numberOfReservation < 5) {
       setState(() {
         check = true;
+        print(check);
       });
 
       // FirebaseFirestore.instance
@@ -75,6 +113,7 @@ class _BookDetailsState extends State<BookDetails> {
       //     .doc(BARCODE)
       //     .update({'copies': datas[index]['copies'] - 1});
       //      // need to get currentCopies  - 1
+
       String id = Uuid().v1();
       return users
           .doc(id)
@@ -124,36 +163,6 @@ class _BookDetailsState extends State<BookDetails> {
     });
   }
 
-  dynamic rrSSN;
-  dynamic rrBarcode;
-  bool check = false;
-
-  var listOfReservation = [];
-  var docOfReservation = "";
-  var reservedBookToDecrement = '';
-//---------------------------------------------------------------------------
-  dynamic returnBook() async {
-    rrSSN = await users
-        .where("SSN", isEqualTo: SSN)
-        .get()
-        .then((QuerySnapshot snapshot) {
-      snapshot.docs.forEach((element) {
-        listOfReservation.add(element.data());
-      });
-    });
-
-    for (var i = 0; i < listOfReservation.length; i++) {
-      if (listOfReservation[i]['barcode'] == BARCODE &&
-          listOfReservation[i]['returned'] == false) {
-        docOfReservation = listOfReservation[i]['id'];
-        setState(() {
-          check = true;
-        });
-      }
-    }
-    return check;
-  }
-
 //
   Widget buildWidget({BuildContext? context, int? n, Future? fun}) {
     if (n == 0) {
@@ -168,7 +177,7 @@ class _BookDetailsState extends State<BookDetails> {
           //side: BorderSide(color: Colors.red)
         ))),
       );
-    } else if (check) {
+    } else if (check == true) {
       return Row(
         //mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -186,6 +195,9 @@ class _BookDetailsState extends State<BookDetails> {
           ElevatedButton(
             onPressed: () {
               extendReservation();
+              setState(() {
+                check = false;
+              });
             },
             child: Text('Extend'),
             style: ButtonStyle(
@@ -200,7 +212,9 @@ class _BookDetailsState extends State<BookDetails> {
       return ElevatedButton(
         onPressed: () {
           addUser(SSN, BARCODE, outDate, returnDate); //call
-          returnBook();
+          setState(() {
+            check == true;
+          });
         },
         child: Text('Borrow'),
         style: ButtonStyle(
@@ -234,12 +248,6 @@ class _BookDetailsState extends State<BookDetails> {
         enter
         else show reserve
         */
-        floatingActionButton: FloatingActionButton(
-          /* Fetches the books from the DB */
-          onPressed: getData,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ),
         appBar: AppBar(
           title: Text('Book details'),
           centerTitle: true,
@@ -264,6 +272,10 @@ class _BookDetailsState extends State<BookDetails> {
                         author: datas[index]['author'],
                         copies: datas[index]['copies'],
                         imageURL: datas[index]['imageURL']),
+                    // BookDetail(
+                    //     title: datas[index]['title'],
+                    //     author: datas[index]['author'],
+                    //     imageURL: datas[index]['imageURL']),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

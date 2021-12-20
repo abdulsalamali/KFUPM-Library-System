@@ -82,6 +82,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    getData();
     super.initState();
   }
 
@@ -178,14 +179,6 @@ class HomePageState extends State<HomePage> {
               },
               tooltip: 'logout',
               child: Icon(Icons.logout),
-            ),
-            FloatingActionButton(
-              heroTag: "btn2",
-
-              /* Fetches the books from the DB */
-              onPressed: getData,
-              tooltip: 'Increment',
-              child: Icon(Icons.add),
             ),
           ],
         ),
