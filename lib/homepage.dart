@@ -27,9 +27,7 @@ class _homeState extends State<home> {
         text1 = datas[i]['Password'];
       }
     }
-    if (controller1.text == text || controller2.text == text1) {
-      print(datas.length);
-
+    if (controller1.text == text && controller2.text == text1) {
       return Navigator.push(
           context,
           MaterialPageRoute(
