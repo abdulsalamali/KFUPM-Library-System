@@ -188,7 +188,7 @@ class HomePageState extends State<HomePage> {
                 itemCount: datas.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onLongPress: () {
+                    onDoubleTap: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(

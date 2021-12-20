@@ -37,6 +37,7 @@ class _BookState extends State<Book> {
 
   @override
   void initState() {
+    getData();
     super.initState();
   }
 
@@ -51,12 +52,6 @@ class _BookState extends State<Book> {
         ),
       ),
       home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          /* Fetches the books from the DB */
-          onPressed: getData,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ),
         appBar: AppBar(
           title: Text('Book details'),
           centerTitle: true,

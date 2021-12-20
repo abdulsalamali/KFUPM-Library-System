@@ -47,7 +47,7 @@ class _BookDetailsState extends State<BookDetails> {
   bool check = false;
 
   var listOfReservation = [];
-  var docOfReservation = "";
+  dynamic docOfReservation;
   var reservedBookToDecrement = '';
 //---------------------------------------------------------------------------
 
@@ -68,9 +68,11 @@ class _BookDetailsState extends State<BookDetails> {
     for (var i = 0; i < listOfReservation.length; i++) {
       if (listOfReservation[i]['barcode'] == BARCODE &&
           listOfReservation[i]['returned'] == false) {
-        docOfReservation = listOfReservation[i]['id'];
+        docOfReservation = listOfReservation[i];
+        print(docOfReservation);
         setState(() {
           check = true;
+          print('I am printed');
         });
       }
     }
@@ -97,7 +99,6 @@ class _BookDetailsState extends State<BookDetails> {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
-  reduceCopies() {}
   Future<void> addUser(ssn, barcode, cDate, rDate) async {
     var reservationDocs = await users.where('SSN', isEqualTo: ssn).get();
     var numberOfReservation = reservationDocs.docs.length;
@@ -105,7 +106,6 @@ class _BookDetailsState extends State<BookDetails> {
     if (numberOfReservation < 5) {
       setState(() {
         check = true;
-        print(check);
       });
 
       // FirebaseFirestore.instance
@@ -121,8 +121,8 @@ class _BookDetailsState extends State<BookDetails> {
             'id': id, 'SSN': ssn, // John Doe
             // 'company': company, // Stokes and Sons
             'barcode': barcode, // 42
-            'checkout date': cDate,
-            'Return date': rDate,
+            'CheckoutDate': cDate,
+            'ReturnDate': rDate,
             'returned': false
           })
           .then((value) => print("User Added"))
@@ -153,11 +153,30 @@ class _BookDetailsState extends State<BookDetails> {
   }
 
   extendReservation() {
-    users.doc(docOfReservation.toString()).update({'Return date': extendDate});
+    users
+        .doc(docOfReservation['id'].toString())
+        .update({'ReturnDate': extendDate});
   }
 
   returnReservation() {
-    users.doc(docOfReservation.toString()).update({'returned': true});
+    var actualReturnDate = DateTime.now();
+    users
+        .doc(docOfReservation['id'].toString())
+        .update({'returned': actualReturnDate});
+
+    var data1 = actualReturnDate;
+    var data2 = docOfReservation['ReturnDate'];
+
+    DateTime dateTime1 = actualReturnDate;
+    DateTime dateTime2 = DateTime.parse(data2.toDate().toString());
+    int timeDifference = dateTime1
+        .difference(dateTime2)
+        .inDays; // or in whatever format you want.
+    if (timeDifference > 0) {
+      users
+          .doc(docOfReservation['id'].toString())
+          .update({'penality': timeDifference});
+    }
     setState(() {
       check = false;
     });
