@@ -1,8 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ics324_project/BookCard.dart';
+import 'package:uuid/uuid.dart';
 import 'Book.dart';
 import 'BookCard.dart';
 import 'main.dart';
@@ -57,76 +60,104 @@ class _BookDetailsState extends State<BookDetails> {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
-  int generateRandom() {
-    Random random = new Random();
-    int id = random.nextInt(5);
-    return id;
-  }
-
   reduceCopies() {}
-  Future<void> addUser(ssn, barcode, cDate, rDate) {
-    //borrower
-    // Call the user's CollectionReference to add a new user
-    // returnDate = outDate.add(Duration(days: 50));
+  Future<void> addUser(ssn, barcode, cDate, rDate) async {
+    var reservationDocs = await users.where('SSN', isEqualTo: ssn).get();
+    var numberOfReservation = reservationDocs.docs.length;
 
-    return users
-        .add({
-          'id': generateRandom(), 'SSN': ssn, // John Doe
-          // 'company': company, // Stokes and Sons
-          'barcode': barcode, // 42
-          'checkout date': cDate,
-          'Return date': rDate,
-          'returned': false
-        })
-        .then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user: $error"));
+    if (numberOfReservation < 5) {
+      setState(() {
+        check = true;
+      });
+      var currentCopies;
+      var document = await FirebaseFirestore.instance.collection('book').doc(BARCODE).get().then( function(document) {
+    print(document("name"));
+});
+        document.get() => then(function(document) {
+    print(document("name"));
+});
+
+      print(currentCopies);
+      FirebaseFirestore.instance
+          .collection('Book')
+          .doc(BARCODE)
+          .update({'copies': currentCopies['copies'] - 1});
+      String id = Uuid().v1();
+      return users
+          .doc(id)
+          .set({
+            'id': id, 'SSN': ssn, // John Doe
+            // 'company': company, // Stokes and Sons
+            'barcode': barcode, // 42
+            'checkout date': cDate,
+            'Return date': rDate,
+            'returned': false
+          })
+          .then((value) => print("User Added"))
+          .catchError((error) => print("Failed to add user: $error")); // uuid;
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+                title: const Text('You have checked out 5 books'),
+                content: const Text('You can not borrow more'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ));
+    }
   }
 
-  dynamic meditaor(ssn, barcode) {
+  dynamic meditaor(ssn, isbn) {
     SSN = ssn;
-    BARCODE = barcode;
+    BARCODE = isbn;
   }
 
   extendReservation() {
-    var tmp = [];
+    users.doc(docOfReservation.toString()).update({'Return date': extendDate});
+  }
 
-    users
-        .where("id", isEqualTo: reservationDoc['id'])
-        .get()
-        .then((QuerySnapshot snapshot) {
-      snapshot.docs.forEach((element) {
-        tmp.add(element.id);
-      });
+  returnReservation() {
+    users.doc(docOfReservation.toString()).update({'returned': true});
+    setState(() {
+      check = false;
     });
-
-    users.doc(tmp[0]).update({'Return Date': extendDate});
   }
 
   dynamic rrSSN;
   dynamic rrBarcode;
+  bool check = false;
 
   var listOfReservation = [];
-  var reservationDoc;
-
-  dynamic returnBook() {
-    bool check = false;
-
-    rrSSN =
-        users.where("SSN", isEqualTo: SSN).get().then((QuerySnapshot snapshot) {
+  var docOfReservation = "";
+  var reservedBookToDecrement = '';
+//---------------------------------------------------------------------------
+  dynamic returnBook() async {
+    rrSSN = await users
+        .where("SSN", isEqualTo: SSN)
+        .get()
+        .then((QuerySnapshot snapshot) {
       snapshot.docs.forEach((element) {
         listOfReservation.add(element.data());
       });
     });
 
-    // print(listOfReservation[0]);
-
     for (var i = 0; i < listOfReservation.length; i++) {
-      if (listOfReservation[i]['barcode'] == BARCODE) {
-        reservationDoc = listOfReservation[i];
-        check = true;
+      if (listOfReservation[i]['barcode'] == BARCODE &&
+          listOfReservation[i]['returned'] == false) {
+        docOfReservation = listOfReservation[i]['id'];
+        setState(() {
+          check = true;
+        });
       }
     }
-
     return check;
   }
 
@@ -144,12 +175,14 @@ class _BookDetailsState extends State<BookDetails> {
           //side: BorderSide(color: Colors.red)
         ))),
       );
-    } else if (returnBook()) {
+    } else if (check) {
       return Row(
         //mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              returnReservation();
+            },
             child: Text('Return'),
             style: ButtonStyle(
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -245,7 +278,7 @@ class _BookDetailsState extends State<BookDetails> {
                             context: context,
                             n: list[1],
                             fun: meditaor(
-                                ssn, barcode)), // a place holder for a button
+                                ssn, isbn)), // a place holder for a button
                       ],
                     )
                   ],

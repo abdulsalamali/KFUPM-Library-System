@@ -22,13 +22,14 @@ class _homeState extends State<home> {
     var text1 = 'k';
     for (var i = 0; i < datas.length; i++) {
       if (controller1.text == datas[i]['SSN'] ||
-          controller2.text == datas[i]['password']) {
+          controller2.text == datas[i]['Password']) {
         text = datas[i]['SSN'];
-        text1 = datas[i]['password'];
+        text1 = datas[i]['Password'];
       }
     }
-    print(datas.length);
     if (controller1.text == text || controller2.text == text1) {
+      print(datas.length);
+
       return Navigator.push(
           context,
           MaterialPageRoute(

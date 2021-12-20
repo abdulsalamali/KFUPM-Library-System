@@ -170,6 +170,8 @@ class HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
+              heroTag: "btn1",
+
               /* Fetches the books from the DB */
               onPressed: () {
                 Navigator.pop(context);
@@ -178,6 +180,8 @@ class HomePageState extends State<HomePage> {
               child: Icon(Icons.logout),
             ),
             FloatingActionButton(
+              heroTag: "btn2",
+
               /* Fetches the books from the DB */
               onPressed: getData,
               tooltip: 'Increment',
@@ -202,7 +206,8 @@ class HomePageState extends State<HomePage> {
                                     datas[index]['ISBN'],
                                     datas[index]['copies'],
                                     secure,
-                                    datas[index]['barcode']
+                                    datas[index]
+                                        ['barcode'] // dart dataclass generator
                                   ])));
                     },
                     child: BookCard(
