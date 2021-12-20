@@ -69,19 +69,12 @@ class _BookDetailsState extends State<BookDetails> {
       setState(() {
         check = true;
       });
-      var currentCopies;
-      var document = await FirebaseFirestore.instance.collection('book').doc(BARCODE).get().then( function(document) {
-    print(document("name"));
-});
-        document.get() => then(function(document) {
-    print(document("name"));
-});
 
-      print(currentCopies);
-      FirebaseFirestore.instance
-          .collection('Book')
-          .doc(BARCODE)
-          .update({'copies': currentCopies['copies'] - 1});
+      // FirebaseFirestore.instance
+      //     .collection('Book')
+      //     .doc(BARCODE)
+      //     .update({'copies': datas[index]['copies'] - 1});
+      //      // need to get currentCopies  - 1
       String id = Uuid().v1();
       return users
           .doc(id)
