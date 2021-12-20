@@ -41,11 +41,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        '/Book': (BuildContext context) => Book(
-              hul: (HomePageState.searchQueryController.text.isNotEmpty)
-                  ? HomePageState.searchQueryController.text
-                  : 'Enter search please',
-            ),
+        '/Book': (BuildContext context) => Book(),
         '/details': (BuildContext context) => BookDetails(),
         '/Allbooks': (BuildContext context) => const HomePage(),
         '/': (BuildContext context) => home(),
@@ -66,7 +62,7 @@ class HomePageState extends State<HomePage> {
   List<DocumentSnapshot> datas = <DocumentSnapshot>[];
   static var searchQueryController = TextEditingController();
   bool _isSearching = false;
-
+  dynamic secure;
   String searchQuery = "Search query";
 
   getData() async {
@@ -101,11 +97,23 @@ class HomePageState extends State<HomePage> {
   }
 
   ///
-  void connect() {
-    Navigator.pushNamed(context, '/Book');
-  }
+  // void connect() {
+  //   Navigator.pushNamed(context, '/Book');
+  // }
 
-  ///
+  void connect() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Book(),
+            settings: RouteSettings(
+                // passes an argument to change the route dynamically.
+                arguments: [
+                  secure,
+                  HomePageState
+                      .searchQueryController.text // dart dataclass generator
+                ])));
+  }
 
   List<Widget> _buildActions() {
     if (_isSearching) {
@@ -160,7 +168,7 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final ssn = ModalRoute.of(context)!.settings.arguments as String;
-    final secure = ssn;
+    secure = ssn;
     return Scaffold(
         appBar: AppBar(
           leading: _isSearching ? const BackButton() : Container(),
