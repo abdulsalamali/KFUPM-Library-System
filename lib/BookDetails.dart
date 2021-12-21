@@ -45,7 +45,7 @@ class _BookDetailsState extends State<BookDetails> {
   dynamic rrSSN;
   dynamic rrBarcode;
   bool check = false;
-
+  dynamic copies;
   var listOfReservation = [];
   dynamic docOfReservation;
   var reservedBookToDecrement = '';
@@ -107,12 +107,12 @@ class _BookDetailsState extends State<BookDetails> {
       setState(() {
         check = true;
       });
-
-      // FirebaseFirestore.instance
-      //     .collection('Book')
-      //     .doc(BARCODE)
-      //     .update({'copies': datas[index]['copies'] - 1});
-      //      // need to get currentCopies  - 1
+      copies--;
+      FirebaseFirestore.instance
+          .collection('Book')
+          .doc(BARCODE)
+          .update({'copies': copies});
+      // need to get currentCopies  - 1
 
       String id = Uuid().v1();
       return users
@@ -163,6 +163,10 @@ class _BookDetailsState extends State<BookDetails> {
     users
         .doc(docOfReservation['id'].toString())
         .update({'returned': actualReturnDate});
+    FirebaseFirestore.instance
+        .collection('Book')
+        .doc(BARCODE)
+        .update({'copies': copies});
 
     var data1 = actualReturnDate;
     var data2 = docOfReservation['ReturnDate'];
@@ -184,19 +188,7 @@ class _BookDetailsState extends State<BookDetails> {
 
 //
   Widget buildWidget({BuildContext? context, int? n, Future? fun}) {
-    if (n == 0) {
-      return ElevatedButton(
-        onPressed: () {
-          addReserve(SSN, BARCODE);
-        },
-        child: Text('Reserve'),
-        style: ButtonStyle(
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18.0),
-          //side: BorderSide(color: Colors.red)
-        ))),
-      );
-    } else if (check == true) {
+    if (check == true) {
       return Row(
         //mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -227,6 +219,18 @@ class _BookDetailsState extends State<BookDetails> {
           ),
         ],
       );
+    } else if (n == 0) {
+      return ElevatedButton(
+        onPressed: () {
+          addReserve(SSN, BARCODE);
+        },
+        child: Text('Reserve'),
+        style: ButtonStyle(
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18.0),
+          //side: BorderSide(color: Colors.red)
+        ))),
+      );
     } else {
       return ElevatedButton(
         onPressed: () {
@@ -250,12 +254,15 @@ class _BookDetailsState extends State<BookDetails> {
     final list = ModalRoute.of(context)!.settings.arguments
         as List<dynamic>; // the value passed by main.dart.
     dynamic isbn = list[0];
+    copies = list[1];
     dynamic ssn = list[2];
     dynamic barcode = list[3];
+    dynamic image = list[4];
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
         primaryColor: Colors.amberAccent,
+        scaffoldBackgroundColor: Colors.blueGrey[100],
         textTheme: TextTheme(
           bodyText2: TextStyle(color: Colors.white),
         ),
@@ -268,7 +275,11 @@ class _BookDetailsState extends State<BookDetails> {
         else show reserve
         */
         appBar: AppBar(
-          title: Text('Book details'),
+          backgroundColor: Colors.grey[350],
+          title: Text(
+            'Book details',
+            style: TextStyle(color: Colors.black87),
+          ),
           centerTitle: true,
           leading: BackButton(
             onPressed: () {
@@ -276,41 +287,52 @@ class _BookDetailsState extends State<BookDetails> {
             },
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.only(top: 75),
-          child: ListView.builder(
-            itemCount: datas.length,
-            itemBuilder: (context, index) {
-              if (list[0] == datas[index]['ISBN']) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    BookCard(
-                        // extra: add hero.
-                        title: datas[index]['title'],
-                        author: datas[index]['author'],
-                        copies: datas[index]['copies'],
-                        imageURL: datas[index]['imageURL']),
-                    // BookDetail(
-                    //     title: datas[index]['title'],
-                    //     author: datas[index]['author'],
-                    //     imageURL: datas[index]['imageURL']),
-                    Row(
+        body: Center(
+          child: Container(
+            constraints: BoxConstraints.expand(),
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    colorFilter: new ColorFilter.mode(
+                        Colors.black.withOpacity(0.2), BlendMode.dstATop),
+                    image: NetworkImage("$image"),
+                    fit: BoxFit.cover)),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 180.0),
+              child: ListView.builder(
+                itemCount: datas.length,
+                itemBuilder: (context, index) {
+                  if (list[0] == datas[index]['ISBN']) {
+                    return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        buildWidget(
-                            context: context,
-                            n: list[1],
-                            fun: meditaor(
-                                ssn, isbn)), // a place holder for a button
+                        BookCard(
+                            // extra: add hero.
+                            title: datas[index]['title'],
+                            author: datas[index]['author'],
+                            //copies: datas[index]['copies'],
+                            imageURL: datas[index]['imageURL']),
+                        // BookDetail(
+                        //     title: datas[index]['title'],
+                        //     author: datas[index]['author'],
+                        //     imageURL: datas[index]['imageURL']),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            buildWidget(
+                                context: context,
+                                n: list[1],
+                                fun: meditaor(
+                                    ssn, isbn)), // a place holder for a button
+                          ],
+                        )
                       ],
-                    )
-                  ],
-                );
-              } else {
-                return Center(child: Text(''));
-              }
-            },
+                    );
+                  } else {
+                    return Center(child: Text(''));
+                  }
+                },
+              ),
+            ),
           ),
         ),
       ),

@@ -91,7 +91,7 @@ class HomePageState extends State<HomePage> {
         border: InputBorder.none,
         hintStyle: TextStyle(color: Colors.white30),
       ),
-      style: TextStyle(color: Colors.white, fontSize: 16.0),
+      style: TextStyle(color: Colors.black87, fontSize: 16.0),
       onChanged: (query) => updateSearchQuery(query),
     );
   }
@@ -119,7 +119,10 @@ class HomePageState extends State<HomePage> {
     if (_isSearching) {
       return <Widget>[
         IconButton(
-          icon: const Icon(Icons.search_rounded),
+          icon: const Icon(
+            Icons.search_rounded,
+            color: Colors.black87,
+          ),
           onPressed: () {
             connect();
           },
@@ -171,7 +174,12 @@ class HomePageState extends State<HomePage> {
     secure = ssn;
     return Scaffold(
         appBar: AppBar(
-          leading: _isSearching ? const BackButton() : Container(),
+          backgroundColor: Colors.grey[350],
+          leading: _isSearching
+              ? const BackButton(
+                  color: Colors.black87,
+                )
+              : Container(),
           title: _isSearching ? _buildSearchField() : _buildTitle(context),
           actions: _buildActions(),
         ),
@@ -207,15 +215,16 @@ class HomePageState extends State<HomePage> {
                                     datas[index]['ISBN'],
                                     datas[index]['copies'],
                                     secure,
+                                    datas[index]['barcode'],
                                     datas[index]
-                                        ['barcode'] // dart dataclass generator
+                                        ['imageURL'] // dart dataclass generator
                                   ])));
                     },
                     child: BookCard(
                         // extra: add hero.
                         title: datas[index]['title'],
                         author: datas[index]['author'],
-                        copies: datas[index]['copies'],
+                        //  copies: datas[index]['copies'],
                         imageURL: datas[index]['imageURL']),
                   );
                 },

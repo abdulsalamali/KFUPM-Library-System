@@ -92,7 +92,7 @@ class _BookState extends State<Book> {
                       // extra: add hero.
                       title: datas[index]['title'],
                       author: datas[index]['author'],
-                      copies: datas[index]['copies'],
+                      //  copies: datas[index]['copies'],
                       imageURL: datas[index]['imageURL']),
                 );
               } else {
