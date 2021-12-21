@@ -27,9 +27,16 @@ class _BookDetailsState extends State<BookDetails> {
   var returnDate = DateTime.now().add(Duration(days: 90));
   var extendDate =
       DateTime.now().add(Duration(days: 90)).add(Duration(days: 30));
-
   dynamic SSN;
   dynamic BARCODE;
+  dynamic rrSSN;
+  dynamic rrBarcode;
+  bool check = false;
+  dynamic copies;
+  var listOfReservation = [];
+  dynamic docOfReservation;
+  var reservedBookToDecrement = '';
+//----------------------------------------------- Global Variables
 
   getData() async {
     if (!isFirstTime) {
@@ -41,15 +48,6 @@ class _BookDetailsState extends State<BookDetails> {
       });
     }
   }
-
-  dynamic rrSSN;
-  dynamic rrBarcode;
-  bool check = false;
-  dynamic copies;
-  var listOfReservation = [];
-  dynamic docOfReservation;
-  var reservedBookToDecrement = '';
-//---------------------------------------------------------------------------
 
   dynamic userBorrows() async {
     rrSSN = await users
@@ -85,16 +83,12 @@ class _BookDetailsState extends State<BookDetails> {
   }
 
   CollectionReference users = FirebaseFirestore.instance.collection('Borrows');
-  //CollectionReference borrowsCollection = FirebaseFirestore.instance.collection(collectionPath)
+
   CollectionReference Reserver =
       FirebaseFirestore.instance.collection('Reserves');
 
   Future<void> addReserve(ssn, barcode) {
-    return Reserver.add({
-      'SSN': ssn, // John Doe
-      // 'company': company, // Stokes and Sons
-      'barcode': barcode // 42
-    })
+    return Reserver.add({'SSN': ssn, 'barcode': barcode})
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
   }
@@ -118,9 +112,9 @@ class _BookDetailsState extends State<BookDetails> {
       return users
           .doc(id)
           .set({
-            'id': id, 'SSN': ssn, // John Doe
-            // 'company': company, // Stokes and Sons
-            'barcode': barcode, // 42
+            'id': id,
+            'SSN': ssn,
+            'barcode': barcode,
             'CheckoutDate': cDate,
             'ReturnDate': rDate,
             'returned': false
@@ -190,7 +184,6 @@ class _BookDetailsState extends State<BookDetails> {
   Widget buildWidget({BuildContext? context, int? n, Future? fun}) {
     if (check == true) {
       return Row(
-        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ElevatedButton(
             onPressed: () {
@@ -200,7 +193,6 @@ class _BookDetailsState extends State<BookDetails> {
             style: ButtonStyle(
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
-              //side: BorderSide(color: Colors.red)
             ))),
           ),
           ElevatedButton(
@@ -214,7 +206,6 @@ class _BookDetailsState extends State<BookDetails> {
             style: ButtonStyle(
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
-              //side: BorderSide(color: Colors.red)
             ))),
           ),
         ],
@@ -228,7 +219,6 @@ class _BookDetailsState extends State<BookDetails> {
         style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.0),
-          //side: BorderSide(color: Colors.red)
         ))),
       );
     } else {
@@ -243,7 +233,6 @@ class _BookDetailsState extends State<BookDetails> {
         style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.0),
-          //side: BorderSide(color: Colors.red)
         ))),
       );
     }
@@ -268,12 +257,6 @@ class _BookDetailsState extends State<BookDetails> {
         ),
       ),
       home: Scaffold(
-        /*
-        Later:
-        if copies>0
-        enter
-        else show reserve
-        */
         appBar: AppBar(
           backgroundColor: Colors.grey[350],
           title: Text(
@@ -311,10 +294,6 @@ class _BookDetailsState extends State<BookDetails> {
                             author: datas[index]['author'],
                             //copies: datas[index]['copies'],
                             imageURL: datas[index]['imageURL']),
-                        // BookDetail(
-                        //     title: datas[index]['title'],
-                        //     author: datas[index]['author'],
-                        //     imageURL: datas[index]['imageURL']),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

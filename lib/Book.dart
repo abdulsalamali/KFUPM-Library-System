@@ -7,20 +7,11 @@ import 'BookDetails.dart';
 import 'main.dart';
 
 class Book extends StatefulWidget {
-  // String hul;
-  // Book({
-  //   required this.hul,
-  // });
   @override
   _BookState createState() => _BookState();
 }
 
 class _BookState extends State<Book> {
-  // String hul;
-  // _BookState({
-  //   required this.hul,
-  // });
-
   bool isFirstTime = false;
   List<DocumentSnapshot> datas = <DocumentSnapshot>[];
 
@@ -89,7 +80,6 @@ class _BookState extends State<Book> {
                                 ])));
                   },
                   child: BookCard(
-                      // extra: add hero.
                       title: datas[index]['title'],
                       author: datas[index]['author'],
                       //  copies: datas[index]['copies'],

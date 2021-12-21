@@ -6,11 +6,6 @@ import 'package:ics324_project/BookDetails.dart';
 import 'Book.dart';
 import 'BookDetails.dart';
 import 'homepage.dart';
-/**
- *  register page logic --> 2 buttons one login one to sign up
- * login: same pass? go else no ( controller == user.pass)
- * sign up: new user
- */
 
 void main() async {
   var myObject = HomePageState();
@@ -95,11 +90,6 @@ class HomePageState extends State<HomePage> {
       onChanged: (query) => updateSearchQuery(query),
     );
   }
-
-  ///
-  // void connect() {
-  //   Navigator.pushNamed(context, '/Book');
-  // }
 
   void connect() {
     Navigator.push(
@@ -221,7 +211,6 @@ class HomePageState extends State<HomePage> {
                                   ])));
                     },
                     child: BookCard(
-                        // extra: add hero.
                         title: datas[index]['title'],
                         author: datas[index]['author'],
                         //  copies: datas[index]['copies'],

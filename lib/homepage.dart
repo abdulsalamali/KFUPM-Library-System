@@ -16,6 +16,9 @@ class home extends StatefulWidget {
 class _homeState extends State<home> {
   var controller1 = new TextEditingController();
   var controller2 = new TextEditingController();
+  bool isFirstTime = false;
+  List<DocumentSnapshot> datas = <DocumentSnapshot>[];
+  //---------------------------------------------------------------------------
 
   dynamic myHandler() {
     var text = 'k';
@@ -54,9 +57,6 @@ class _homeState extends State<home> {
               ));
     }
   }
-
-  bool isFirstTime = false;
-  List<DocumentSnapshot> datas = <DocumentSnapshot>[];
 
   getData() async {
     if (!isFirstTime) {
@@ -127,7 +127,6 @@ class _homeState extends State<home> {
               style: ButtonStyle(
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
-                //side: BorderSide(color: Colors.red)
               ))),
             ),
           ],
