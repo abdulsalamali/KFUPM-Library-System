@@ -6,11 +6,6 @@ import 'package:ics324_project/BookDetails.dart';
 import 'Book.dart';
 import 'BookDetails.dart';
 import 'homepage.dart';
-/**
- *  register page logic --> 2 buttons one login one to sign up
- * login: same pass? go else no ( controller == user.pass)
- * sign up: new user
- */
 
 void main() async {
   var myObject = HomePageState();
@@ -41,11 +36,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        '/Book': (BuildContext context) => Book(
-              hul: (HomePageState.searchQueryController.text.isNotEmpty)
-                  ? HomePageState.searchQueryController.text
-                  : 'Enter search please',
-            ),
+        '/Book': (BuildContext context) => Book(),
         '/details': (BuildContext context) => BookDetails(),
         '/Allbooks': (BuildContext context) => const HomePage(),
         '/': (BuildContext context) => home(),
@@ -66,7 +57,7 @@ class HomePageState extends State<HomePage> {
   List<DocumentSnapshot> datas = <DocumentSnapshot>[];
   static var searchQueryController = TextEditingController();
   bool _isSearching = false;
-
+  dynamic secure;
   String searchQuery = "Search query";
 
   getData() async {
@@ -82,6 +73,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    getData();
     super.initState();
   }
 
@@ -94,23 +86,33 @@ class HomePageState extends State<HomePage> {
         border: InputBorder.none,
         hintStyle: TextStyle(color: Colors.white30),
       ),
-      style: TextStyle(color: Colors.white, fontSize: 16.0),
+      style: TextStyle(color: Colors.black87, fontSize: 16.0),
       onChanged: (query) => updateSearchQuery(query),
     );
   }
 
-  ///
   void connect() {
-    Navigator.pushNamed(context, '/Book');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Book(),
+            settings: RouteSettings(
+                // passes an argument to change the route dynamically.
+                arguments: [
+                  secure,
+                  HomePageState
+                      .searchQueryController.text // dart dataclass generator
+                ])));
   }
-
-  ///
 
   List<Widget> _buildActions() {
     if (_isSearching) {
       return <Widget>[
         IconButton(
-          icon: const Icon(Icons.search_rounded),
+          icon: const Icon(
+            Icons.search_rounded,
+            color: Colors.black87,
+          ),
           onPressed: () {
             connect();
           },
@@ -159,10 +161,15 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final ssn = ModalRoute.of(context)!.settings.arguments as String;
-    final secure = ssn;
+    secure = ssn;
     return Scaffold(
         appBar: AppBar(
-          leading: _isSearching ? const BackButton() : Container(),
+          backgroundColor: Colors.grey[350],
+          leading: _isSearching
+              ? const BackButton(
+                  color: Colors.black87,
+                )
+              : Container(),
           title: _isSearching ? _buildSearchField() : _buildTitle(context),
           actions: _buildActions(),
         ),
@@ -170,18 +177,14 @@ class HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
+              heroTag: "btn1",
+
               /* Fetches the books from the DB */
               onPressed: () {
                 Navigator.pop(context);
               },
               tooltip: 'logout',
               child: Icon(Icons.logout),
-            ),
-            FloatingActionButton(
-              /* Fetches the books from the DB */
-              onPressed: getData,
-              tooltip: 'Increment',
-              child: Icon(Icons.add),
             ),
           ],
         ),
@@ -191,7 +194,7 @@ class HomePageState extends State<HomePage> {
                 itemCount: datas.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onLongPress: () {
+                    onDoubleTap: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -202,14 +205,15 @@ class HomePageState extends State<HomePage> {
                                     datas[index]['ISBN'],
                                     datas[index]['copies'],
                                     secure,
-                                    datas[index]['barcode']
+                                    datas[index]['barcode'],
+                                    datas[index]
+                                        ['imageURL'] // dart dataclass generator
                                   ])));
                     },
                     child: BookCard(
-                        // extra: add hero.
                         title: datas[index]['title'],
                         author: datas[index]['author'],
-                        copies: datas[index]['copies'],
+                        //  copies: datas[index]['copies'],
                         imageURL: datas[index]['imageURL']),
                   );
                 },

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 class BookCard extends StatelessWidget {
   final String title;
   final String author;
-  final int copies;
+  //final int copies;
   final String imageURL;
   BookCard({
     required this.title,
-    required this.copies,
+    // required this.copies,
     required this.author,
     required this.imageURL,
   });
@@ -90,12 +90,12 @@ class BookCard extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.schedule,
+                        Icons.book_outlined,
                         color: Colors.yellow,
                         size: 18,
                       ),
-                      SizedBox(width: 7),
-                      Text(copies.toString()),
+
+                      //Text(copies.toString()),
                     ],
                   ),
                 )

@@ -16,19 +16,21 @@ class home extends StatefulWidget {
 class _homeState extends State<home> {
   var controller1 = new TextEditingController();
   var controller2 = new TextEditingController();
+  bool isFirstTime = false;
+  List<DocumentSnapshot> datas = <DocumentSnapshot>[];
+  //---------------------------------------------------------------------------
 
   dynamic myHandler() {
     var text = 'k';
     var text1 = 'k';
     for (var i = 0; i < datas.length; i++) {
       if (controller1.text == datas[i]['SSN'] ||
-          controller2.text == datas[i]['password']) {
+          controller2.text == datas[i]['Password']) {
         text = datas[i]['SSN'];
-        text1 = datas[i]['password'];
+        text1 = datas[i]['Password'];
       }
     }
-    print(datas.length);
-    if (controller1.text == text || controller2.text == text1) {
+    if (controller1.text == text && controller2.text == text1) {
       return Navigator.push(
           context,
           MaterialPageRoute(
@@ -56,9 +58,6 @@ class _homeState extends State<home> {
     }
   }
 
-  bool isFirstTime = false;
-  List<DocumentSnapshot> datas = <DocumentSnapshot>[];
-
   getData() async {
     if (!isFirstTime) {
       QuerySnapshot snap =
@@ -72,6 +71,7 @@ class _homeState extends State<home> {
 
   @override
   void initState() {
+    getData();
     super.initState();
   }
 
@@ -86,12 +86,6 @@ class _homeState extends State<home> {
         ),
       ),
       home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          /* Fetches the books from the DB */
-          onPressed: getData,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ),
         appBar: AppBar(
           title: Text('Home page'),
           centerTitle: true,
@@ -133,7 +127,6 @@ class _homeState extends State<home> {
               style: ButtonStyle(
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
-                //side: BorderSide(color: Colors.red)
               ))),
             ),
           ],
